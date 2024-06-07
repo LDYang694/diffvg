@@ -38,14 +38,16 @@ struct Path {
          int num_base_points,
          int num_points,
          bool is_closed,
-         bool use_distance_approx) :
+         bool use_distance_approx,
+         ptr<float> z_values) :
         num_control_points(num_control_points.get()),
         points(points.get()),
         thickness(thickness.get()),
         num_base_points(num_base_points),
         num_points(num_points),
         is_closed(is_closed),
-        use_distance_approx(use_distance_approx) {}
+        use_distance_approx(use_distance_approx),
+        z_values(z_values.get()) {        }
 
     int *num_control_points;
     float *points;
@@ -54,6 +56,7 @@ struct Path {
     int num_points;
     bool is_closed;
     bool use_distance_approx;
+    float* z_values;
 
     bool has_thickness() const {
         return thickness != nullptr;

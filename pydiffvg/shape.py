@@ -23,13 +23,15 @@ class Path:
                  is_closed,
                  stroke_width = torch.tensor(1.0),
                  id = '',
-                 use_distance_approx = False):
+                 use_distance_approx = False,
+                 z_values = None):
         self.num_control_points = num_control_points
         self.points = points
         self.is_closed = is_closed
         self.stroke_width = stroke_width
         self.id = id
         self.use_distance_approx = use_distance_approx
+        self.z_values = torch.ones_like(points[:, 0])*-1 if z_values is None else z_values
 
 class Polygon:
     def __init__(self, points, is_closed, stroke_width = torch.tensor(1.0), id = ''):

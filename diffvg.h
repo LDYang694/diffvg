@@ -154,3 +154,10 @@ inline uint32_t expand_bits(uint32_t x) {
 //     return __builtin_popcount(x);
 // #endif
 // }
+
+
+struct return_bool_with_value
+{
+    bool return_bool;
+    float value;
+};

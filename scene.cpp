@@ -73,6 +73,9 @@ void copy_and_init_shapes(Scene &scene,
                 for (int i = 0; i < 2 * p_->num_points; i++) {
                     p->points[i] = p_->points[i];
                 }
+                for (int i = 0;i< p_->num_points; i++) {
+                    p->z_values[i] = p_->z_values[i];
+                }
                 p->is_closed = p_->is_closed;
                 p->use_distance_approx = p_->use_distance_approx;
                 Path *d_p = (Path *)scene.d_shapes[shape_id].ptr;
@@ -765,6 +768,8 @@ size_t allocate_buffers(Scene &scene,
                 buffer_size += align(sizeof(int) * p_->num_base_points); // p->num_control_points
                 if (alloc_mode) p->points = (float*)&scene.buffer[buffer_size];
                 buffer_size += align(sizeof(float) * (2 * p_->num_points)); // p->points
+                if (alloc_mode) p->z_values = (float*)&scene.buffer[buffer_size];
+                buffer_size += align(sizeof(float) * (p_->num_points)); // d_p->points
                 if (alloc_mode) d_p->points = (float*)&scene.buffer[buffer_size];
                 buffer_size += align(sizeof(float) * (2 * p_->num_points)); // d_p->points
                 if (p_->thickness != nullptr) {

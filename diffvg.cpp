@@ -508,6 +508,7 @@ struct Fragment {
     float alpha;
     int group_id;
     bool is_stroke;
+    float sort_value;
 };
 
 struct PrefilterFragment {
@@ -553,7 +554,8 @@ Vector4f sample_color(const SceneData &scene,
             auto group_id = node.child0;
             const ShapeGroup &shape_group = scene.shape_groups[group_id];
             if (shape_group.stroke_color != nullptr) {
-                if (within_distance(scene, group_id, pt, edge_query)) {
+                return_bool_with_value bool_with_z =  within_distance_with_z(scene, group_id, pt, edge_query);
+                if (bool_with_z.return_bool) {
                     auto color_alpha = sample_color(shape_group.stroke_color_type,
                                                     shape_group.stroke_color,
                                                     pt);
@@ -562,6 +564,7 @@ Vector4f sample_color(const SceneData &scene,
                     f.alpha = color_alpha[3];
                     f.group_id = group_id;
                     f.is_stroke = true;
+                    f.sort_value = float(bool_with_z.value);
                     assert(num_fragments < max_hit_shapes);
                     fragments[num_fragments++] = f;
                 }
@@ -604,15 +607,30 @@ Vector4f sample_color(const SceneData &scene,
     }
     // Sort the fragments from back to front (i.e. increasing order of group id)
     // https://github.com/frigaut/yorick-imutil/blob/master/insort.c#L37
+    // for (int i = 1; i < num_fragments; i++) {
+    //     auto j = i;
+    //     auto temp = fragments[j];
+    //     while (j > 0 && fragments[j - 1].sort_value > temp.sort_value) {
+    //         fragments[j] = fragments[j - 1];
+    //         j--;
+    //     }
+    //     fragments[j] = temp;
+    // }
+    // void sortFragments(std::vector<Fragment>& fragments) 
+    // Sort the fragments by sort_value, then by group_id
     for (int i = 1; i < num_fragments; i++) {
         auto j = i;
         auto temp = fragments[j];
-        while (j > 0 && fragments[j - 1].group_id > temp.group_id) {
+        while (j > 0 && (fragments[j - 1].sort_value > temp.sort_value ||
+                         (fragments[j - 1].sort_value == temp.sort_value &&
+                          fragments[j - 1].group_id > temp.group_id))) {
             fragments[j] = fragments[j - 1];
             j--;
         }
         fragments[j] = temp;
     }
+
+
     // Blend the color
     Vector3f accum_color[max_hit_shapes];
     float accum_alpha[max_hit_shapes];
@@ -1696,7 +1714,7 @@ PYBIND11_MODULE(diffvg, m) {
         .def_readonly("center", &Ellipse::center);
 
     py::class_<Path>(m, "Path")
-        .def(py::init<ptr<int>, ptr<float>, ptr<float>, int, int, bool, bool>())
+        .def(py::init<ptr<int>, ptr<float>, ptr<float>, int, int, bool, bool,ptr<float>>())
         .def("get_ptr", &Path::get_ptr)
         .def("has_thickness", &Path::has_thickness)
         .def("copy_to", &Path::copy_to)

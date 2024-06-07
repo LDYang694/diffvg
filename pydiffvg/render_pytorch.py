@@ -72,6 +72,7 @@ class RenderFunction(torch.autograd.Function):
                     args.append(None)
                 args.append(shape.is_closed)
                 args.append(shape.use_distance_approx)
+                args.append(shape.z_values.cpu())
             elif isinstance(shape, pydiffvg.Polygon):
                 assert(shape.points.is_contiguous())
                 assert(shape.points.shape[1] == 2)
@@ -230,13 +231,16 @@ class RenderFunction(torch.autograd.Function):
                 current_index += 1
                 use_distance_approx = args[current_index]
                 current_index += 1
+                z_values = args[current_index]
+                current_index += 1
                 shape = diffvg.Path(diffvg.int_ptr(num_control_points.data_ptr()),
                                     diffvg.float_ptr(points.data_ptr()),
                                     diffvg.float_ptr(thickness.data_ptr() if thickness is not None else 0),
                                     num_control_points.shape[0],
                                     points.shape[0],
                                     is_closed,
-                                    use_distance_approx)
+                                    use_distance_approx,
+                                    diffvg.float_ptr(z_values.data_ptr()),)
             elif shape_type == diffvg.ShapeType.rect:
                 p_min = args[current_index]
                 current_index += 1
