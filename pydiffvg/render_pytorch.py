@@ -769,6 +769,7 @@ class RenderFunction(torch.autograd.Function):
                 d_args.append(thickness)
                 d_args.append(None) # is_closed
                 d_args.append(None) # use_distance_approx
+                d_args.append(None) # z_values
             elif d_shape.type == diffvg.ShapeType.rect:
                 d_rect = d_shape.as_rect()
                 p_min = torch.tensor((d_rect.p_min.x, d_rect.p_min.y))
