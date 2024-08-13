@@ -1517,7 +1517,7 @@ void render(std::shared_ptr<Scene> scene,
         }
     }
 #endif
-    parallel_init();
+    // parallel_init();
 
     float *weight_image = nullptr;
     // Allocate and zero the weight image
@@ -1658,7 +1658,7 @@ void render(std::shared_ptr<Scene> scene,
         cuda_synchronize();
     }
 
-    parallel_cleanup();
+    // parallel_cleanup();
 #ifdef __NVCC__
     if (old_device_id != -1) {
         checkCuda(cudaSetDevice(old_device_id));
